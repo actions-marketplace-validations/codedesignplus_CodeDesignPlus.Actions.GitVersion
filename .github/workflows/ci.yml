@@ -7,7 +7,10 @@ on:
       - rc
       - dev
       - feature/*
-
+env:
+  IS_RELEASE: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
+  IS_RC: ${{ github.ref == 'refs/heads/rc' }}
+  IS_BETA: ${{ github.ref == 'refs/heads/dev' }}
 jobs:
   test-typescript:
     name: TypeScript Tests
@@ -84,12 +87,14 @@ jobs:
 
       - name: Push tag
         id: push_tag
+        if: env.IS_RELEASE == 'true' || env.IS_RC == 'true' || env.IS_BETA == 'true'
         uses: mathieudutour/github-tag-action@v6.1
         with:
           custom_tag: ${{ steps.test-action.outputs.new-version }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Changelog
+        if: env.IS_RELEASE == 'true' || env.IS_RC == 'true'
         id: build_changelog
         uses: mikepenz/release-changelog-builder-action@v4
         with:
@@ -101,6 +106,7 @@ jobs:
           
       # Publicar release con changelog
       - name: Create GitHub Release
+        if: env.IS_RELEASE == 'true' || env.IS_RC == 'true'
         uses: mikepenz/action-gh-release@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
