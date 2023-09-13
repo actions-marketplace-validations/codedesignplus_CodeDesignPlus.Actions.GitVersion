@@ -86,12 +86,15 @@ Contains the value of the previous tag, before calculating a new one.
 ## Example usage
 
 ```yaml
-uses: codedesignplus/git-version@YOUR_COMMIT_SHA_OR_TAG
+uses: codedesignplus/git-version@v0.0.1
 with:
-  version: latest
-  folder: ${{ github.workspace }}
+  folder: ${{github.workspace}}
   release-branch: 'main'
+  release-candidate-branch: 'rc'
+  beta-branch: 'dev'
   major-identifier: 'breaking'
-  minor-identifier: 'feat'
+  minor-identifier: 'feat' 
   prefix: 'v'
-  dir-affected: './path1,./path2'
+  dir-affected: ./
+  previous-version: true
+  new-version: true

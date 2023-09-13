@@ -24,6 +24,8 @@ jobs:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
 
       - name: Setup Node.js
         id: setup-node
@@ -60,6 +62,16 @@ jobs:
       - name: Test
         id: npm-ci-test
         run: npm run ci-test
+        
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v7
+
+      - name: Running on the default branch.
+        run: |
+          echo "Running on default: ${{ steps.branch-name.outputs.current_branch }}" 
+      
+
 
       - name: Test Local Action
         id: test-action
@@ -84,6 +96,30 @@ jobs:
           echo Previous Version Prefix "${{ steps.test-action.outputs.previous-version-prefix }}"
           echo New Version "${{steps.test-action.outputs.new-version}}"
           echo New Version Prefix "${{steps.test-action.outputs.new-version-prefix}}"
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.projectVersion=${{ steps.test-action.outputs.new-version-prefix }}
+            -Dsonar.organization=codedesignplus
+            -Dsonar.projectKey=CodeDesignPlus.Actions.GitVersion.Key
+            -Dsonar.projectName=CodeDesignPlus.Actions.GitVersion
+            -Dsonar.test.exclusions=__tests__/**
+            -Dsonar.javascript.lcov.reportPaths=${{github.workspace}}/coverage/lcov.info
+            -Dsonar.sources=src
+            -Dsonar.tests=__tests__
+
+      - name: SonarQube Quality Gate check
+        id: sonarqube-quality-gate-check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
       - name: Push tag
         id: push_tag
