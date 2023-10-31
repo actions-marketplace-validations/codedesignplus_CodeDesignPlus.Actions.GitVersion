@@ -73,7 +73,7 @@
   },
   "devDependencies": {
     "@types/jest": "^29.5.4",
-    "@types/node": "^20.6.0",
+    "@types/node": "^20.8.10",
     "@types/figlet": "^1.5.6",
     "@types/uuid": "^9.0.3",
     "@typescript-eslint/eslint-plugin": "^6.7.0",
