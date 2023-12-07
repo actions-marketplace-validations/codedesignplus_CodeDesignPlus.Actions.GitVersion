@@ -65,7 +65,7 @@ jobs:
         
       - name: Get branch name
         id: branch-name
-        uses: tj-actions/branch-names@v7
+        uses: tj-actions/branch-names@v8
 
       - name: Running on the default branch.
         run: |
